@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fhmq/hmq/broker/lib/sessions"
-	"github.com/fhmq/hmq/broker/lib/topics"
-	"github.com/fhmq/hmq/plugins/bridge"
+	"github.com/summer2186/hmq/broker/lib/sessions"
+	"github.com/summer2186/hmq/broker/lib/topics"
+	"github.com/summer2186/hmq/plugins/bridge"
 
 	"github.com/eclipse/paho.mqtt.golang/packets"
 	"go.uber.org/zap"
