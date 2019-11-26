@@ -5,22 +5,20 @@ package broker
 import (
 	"crypto/tls"
 	"fmt"
+	"golang.org/x/net/websocket"
 	"net"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/summer2186/hmq/plugins/bridge"
-
-	"github.com/summer2186/hmq/plugins/auth"
+	"github.com/eclipse/paho.mqtt.golang/packets"
+	"go.uber.org/zap"
 
 	"github.com/summer2186/hmq/broker/lib/sessions"
 	"github.com/summer2186/hmq/broker/lib/topics"
-
-	"github.com/eclipse/paho.mqtt.golang/packets"
+	"github.com/summer2186/hmq/plugins/auth"
+	"github.com/summer2186/hmq/plugins/bridge"
 	"github.com/summer2186/hmq/pool"
-	"go.uber.org/zap"
-	"golang.org/x/net/websocket"
 )
 
 const (
@@ -96,6 +94,10 @@ func NewBroker(config *Config) (*Broker, error) {
 
 	b.auth = auth.NewAuth(b.config.Plugin.Auth)
 	b.bridgeMQ = bridge.NewBridgeMQ(b.config.Plugin.Bridge)
+
+	if b.config.Auth != nil {
+		b.auth = b.config.Auth
+	}
 
 	return b, nil
 }

@@ -12,8 +12,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/summer2186/hmq/logger"
 	"go.uber.org/zap"
+
+	"github.com/summer2186/hmq/logger"
+	"github.com/summer2186/hmq/plugins/auth"
 )
 
 type Config struct {
@@ -31,6 +33,7 @@ type Config struct {
 	TlsInfo  TLSInfo   `json:"tlsInfo"`
 	Debug    bool      `json:"debug"`
 	Plugin   Plugins   `json:"plugins"`
+	Auth     auth.Auth `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth
 }
 
 type Plugins struct {
