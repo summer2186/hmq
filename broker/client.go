@@ -5,10 +5,12 @@ package broker
 import (
 	"context"
 	"errors"
+	"io"
 	"math/rand"
 	"net"
 	"reflect"
 	"regexp"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -46,6 +48,22 @@ var (
 	groupCompile = regexp.MustCompile(_GroupTopicRegexp)
 )
 
+type ClientAdditionData interface {
+	io.Closer
+}
+
+type Client interface {
+	GetUserName() string
+	GetClientId() string
+	SetClientAdditionData(data ClientAdditionData)
+	GetClientAdditionData() ClientAdditionData
+}
+
+type Auth2 interface {
+	CheckACL(client Client, action, topic string) bool
+	CheckConnect(clientID, username, password string) (ClientAdditionData, bool)
+}
+
 type client struct {
 	typ         int
 	mu          sync.Mutex
@@ -63,6 +81,8 @@ type client struct {
 	qoss        []byte
 	rmsgs       []*packets.PublishPacket
 	routeSubMap map[string]uint64
+
+	clientAdditionData ClientAdditionData
 }
 
 type subscription struct {
@@ -617,6 +637,8 @@ func (c *client) Close() {
 		c.conn = nil
 	}
 
+	c.safeReleaseClientAdditionData()
+
 	subs := c.subMap
 
 	if b != nil {
@@ -666,4 +688,49 @@ func (c *client) WriterPacket(packet packets.ControlPacket) error {
 	err := packet.Write(c.conn)
 	c.mu.Unlock()
 	return err
+}
+
+func (c *client) SetClientAdditionData(data ClientAdditionData) {
+	c.mu.Lock()
+	rv := c.clientAdditionData
+	c.clientAdditionData = data
+	c.mu.Unlock()
+
+	if rv != nil {
+		_ = rv.Close()
+	}
+}
+
+func (c *client) GetClientAdditionData() ClientAdditionData {
+	c.mu.Lock()
+	rv := c.clientAdditionData
+	c.mu.Unlock()
+
+	return rv
+}
+
+func (c *client) safeReleaseClientAdditionData() {
+	c.mu.Lock()
+	defer func() {
+		if err := recover(); err != nil {
+			debug.PrintStack()
+		}
+	}()
+
+	data := c.clientAdditionData
+	c.clientAdditionData = nil
+
+	c.mu.Unlock()
+
+	if data != nil {
+		_ = data.Close()
+	}
+}
+
+func (c *client) GetUserName() string {
+	return c.info.username
+}
+
+func (c *client) GetClientId() string {
+	return c.info.clientID
 }
