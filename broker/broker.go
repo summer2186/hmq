@@ -45,6 +45,7 @@ type Broker struct {
 	topicsMgr   *topics.Manager
 	sessionMgr  *sessions.Manager
 	auth        auth.Auth
+	auth2       Auth2
 	bridgeMQ    bridge.BridgeMQ
 }
 
