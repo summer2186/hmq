@@ -33,7 +33,9 @@ type Config struct {
 	TlsInfo  TLSInfo   `json:"tlsInfo"`
 	Debug    bool      `json:"debug"`
 	Plugin   Plugins   `json:"plugins"`
-	Auth     auth.Auth `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth
+
+	Auth  auth.Auth `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth
+	Auth2 Auth2     `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth 和 Auth
 }
 
 type Plugins struct {

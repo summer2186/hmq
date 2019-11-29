@@ -96,6 +96,7 @@ func NewBroker(config *Config) (*Broker, error) {
 	b.auth = auth.NewAuth(b.config.Plugin.Auth)
 	b.bridgeMQ = bridge.NewBridgeMQ(b.config.Plugin.Bridge)
 
+	b.auth2 = b.config.Auth2
 	if b.config.Auth != nil {
 		b.auth = b.config.Auth
 	}
@@ -284,7 +285,38 @@ func (b *Broker) handleConnection(typ int, conn net.Conn) {
 		return
 	}
 
-	if typ == CLIENT && !b.CheckConnectAuth(string(msg.ClientIdentifier), string(msg.Username), string(msg.Password)) {
+	var clientAdditionData ClientAdditionData
+	if typ == CLIENT {
+		if b.auth2 != nil {
+			cad, ok := b.auth2.CheckConnect(string(msg.ClientIdentifier), string(msg.Username), string(msg.Password))
+			if !ok {
+				if cad != nil {
+					panic("if CheckConnect return false, ClientAdditionData must be nil")
+				}
+
+				connack.ReturnCode = packets.ErrRefusedNotAuthorised
+				err = connack.Write(conn)
+				if err != nil {
+					log.Error("send connack error, ", zap.Error(err), zap.String("clientID", msg.ClientIdentifier))
+					return
+				}
+				return
+			}
+			clientAdditionData = cad
+		} else {
+			if !b.CheckConnectAuth(string(msg.ClientIdentifier), string(msg.Username), string(msg.Password)) {
+				connack.ReturnCode = packets.ErrRefusedNotAuthorised
+				err = connack.Write(conn)
+				if err != nil {
+					log.Error("send connack error, ", zap.Error(err), zap.String("clientID", msg.ClientIdentifier))
+					return
+				}
+				return
+			}
+		}
+	}
+
+	/*if typ == CLIENT && !b.CheckConnectAuth(string(msg.ClientIdentifier), string(msg.Username), string(msg.Password)) {
 		connack.ReturnCode = packets.ErrRefusedNotAuthorised
 		err = connack.Write(conn)
 		if err != nil {
@@ -292,10 +324,13 @@ func (b *Broker) handleConnection(typ int, conn net.Conn) {
 			return
 		}
 		return
-	}
+	}*/
 
 	err = connack.Write(conn)
 	if err != nil {
+		if clientAdditionData != nil {
+			_ = clientAdditionData.Close()
+		}
 		log.Error("send connack error, ", zap.Error(err), zap.String("clientID", msg.ClientIdentifier))
 		return
 	}
@@ -319,10 +354,11 @@ func (b *Broker) handleConnection(typ int, conn net.Conn) {
 	}
 
 	c := &client{
-		typ:    typ,
-		broker: b,
-		conn:   conn,
-		info:   info,
+		typ:                typ,
+		broker:             b,
+		conn:               conn,
+		info:               info,
+		clientAdditionData: clientAdditionData,
 	}
 
 	c.init()
