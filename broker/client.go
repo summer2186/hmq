@@ -376,15 +376,11 @@ func (c *client) processClientSubscribe(packet *packets.SubscribePacket) {
 
 	for i, topic := range topics {
 		t := topic
-		if b.auth2 != nil {
-
-		} else {
-			//check topic auth for client
-			if !b.CheckTopicAuth(c, SUB, c.info.clientID, c.info.username, c.info.remoteIP, topic) {
-				log.Error("Sub topic Auth failed: ", zap.String("topic", topic), zap.String("ClientID", c.info.clientID))
-				retcodes = append(retcodes, QosFailure)
-				continue
-			}
+		//check topic auth for client
+		if !b.CheckTopicAuth(c, SUB, c.info.clientID, c.info.username, c.info.remoteIP, topic) {
+			log.Error("Sub topic Auth failed: ", zap.String("topic", topic), zap.String("ClientID", c.info.clientID))
+			retcodes = append(retcodes, QosFailure)
+			continue
 		}
 
 		b.Publish(&bridge.Elements{
