@@ -262,6 +262,11 @@ func (c *client) processClientPublish(packet *packets.PublishPacket) {
 
 	topic := packet.TopicName
 
+	if c.broker.config.MaxTopicLength > 0 && len(topic) > c.broker.config.MaxTopicLength {
+		log.Error("Topic too long, ", zap.Int("topic len", len(topic)), zap.String("ClientID", c.info.clientID))
+		return
+	}
+
 	if !c.broker.CheckTopicAuth(c, PUB, c.info.clientID, c.info.username, c.info.remoteIP, topic) {
 		log.Error("Pub Topics Auth failed, ", zap.String("topic", topic), zap.String("ClientID", c.info.clientID))
 		return
@@ -373,6 +378,14 @@ func (c *client) processClientSubscribe(packet *packets.SubscribePacket) {
 	suback := packets.NewControlPacket(packets.Suback).(*packets.SubackPacket)
 	suback.MessageID = packet.MessageID
 	var retcodes []byte
+
+	// check topic length
+	for _, topic := range topics {
+		if c.broker.config.MaxTopicLength > 0 && len(topic) > c.broker.config.MaxTopicLength {
+			log.Error("Topic too long, ", zap.Int("topic len", len(topic)), zap.String("ClientID", c.info.clientID))
+			return
+		}
+	}
 
 	for i, topic := range topics {
 		t := topic

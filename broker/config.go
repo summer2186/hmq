@@ -19,20 +19,21 @@ import (
 )
 
 type Config struct {
-	Worker   int       `json:"workerNum"`
-	HTTPPort string    `json:"httpPort"`
-	Host     string    `json:"host"`
-	Port     string    `json:"port"`
-	Cluster  RouteInfo `json:"cluster"`
-	Router   string    `json:"router"`
-	TlsHost  string    `json:"tlsHost"`
-	TlsPort  string    `json:"tlsPort"`
-	WsPath   string    `json:"wsPath"`
-	WsPort   string    `json:"wsPort"`
-	WsTLS    bool      `json:"wsTLS"`
-	TlsInfo  TLSInfo   `json:"tlsInfo"`
-	Debug    bool      `json:"debug"`
-	Plugin   Plugins   `json:"plugins"`
+	Worker         int       `json:"workerNum"`
+	HTTPPort       string    `json:"httpPort"`
+	Host           string    `json:"host"`
+	Port           string    `json:"port"`
+	Cluster        RouteInfo `json:"cluster"`
+	Router         string    `json:"router"`
+	TlsHost        string    `json:"tlsHost"`
+	TlsPort        string    `json:"tlsPort"`
+	WsPath         string    `json:"wsPath"`
+	WsPort         string    `json:"wsPort"`
+	WsTLS          bool      `json:"wsTLS"`
+	TlsInfo        TLSInfo   `json:"tlsInfo"`
+	Debug          bool      `json:"debug"`
+	Plugin         Plugins   `json:"plugins"`
+	MaxTopicLength int       `json:"maxTopicLength"`
 
 	Auth  auth.Auth `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth
 	Auth2 Auth2     `json:"-"` // 如果设置了该项目，那么忽略掉 Plugin.Auth 和 Auth
