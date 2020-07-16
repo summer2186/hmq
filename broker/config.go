@@ -10,9 +10,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/fhmq/hmq/logger"
-	"github.com/fhmq/hmq/plugins/auth"
-	"github.com/fhmq/hmq/plugins/bridge"
+	"github.com/summer2186/hmq/logger"
+	"github.com/summer2186/hmq/plugins/auth"
+	"github.com/summer2186/hmq/plugins/bridge"
 	"go.uber.org/zap"
 )
 
@@ -158,7 +158,6 @@ func LoadConfig(filename string) (*Config, error) {
 
 	return &config, nil
 }
-
 
 func (p *Plugins) UnmarshalJSON(b []byte) error {
 	var named NamedPlugins

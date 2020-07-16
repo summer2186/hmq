@@ -1,7 +1,7 @@
 package broker
 
 import (
-	"github.com/fhmq/hmq/plugins/bridge"
+	"github.com/summer2186/hmq/plugins/bridge"
 	"go.uber.org/zap"
 )
 

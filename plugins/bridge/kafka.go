@@ -3,11 +3,13 @@ package bridge
 import (
 	"encoding/json"
 	"errors"
+
+	//"github.com/Shopify/sarama"
 	"io/ioutil"
 	"strings"
-	"time"
+	//"time"
 
-	"github.com/Shopify/sarama"
+	//"github.com/Shopify/sarama"
 	"go.uber.org/zap"
 )
 
@@ -23,7 +25,7 @@ type kafakConfig struct {
 
 type kafka struct {
 	kafakConfig kafakConfig
-	kafkaClient sarama.AsyncProducer
+	//kafkaClient sarama.AsyncProducer
 }
 
 //Init init kafak client
@@ -46,7 +48,7 @@ func InitKafka() *kafka {
 
 //connect
 func (k *kafka) connect() {
-	conf := sarama.NewConfig()
+	/*conf := sarama.NewConfig()
 	conf.Version = sarama.V1_1_1_0
 	kafkaClient, err := sarama.NewAsyncProducer(k.kafakConfig.Addr, conf)
 	if err != nil {
@@ -59,7 +61,7 @@ func (k *kafka) connect() {
 		}
 	}()
 
-	k.kafkaClient = kafkaClient
+	k.kafkaClient = kafkaClient*/
 }
 
 //Publish publish to kafka
@@ -104,7 +106,7 @@ func (k *kafka) Publish(e *Elements) error {
 }
 
 func (k *kafka) publish(topics map[string]bool, key string, msg *Elements) error {
-	payload, err := json.Marshal(msg)
+	/*payload, err := json.Marshal(msg)
 	if err != nil {
 		return err
 	}
@@ -121,7 +123,7 @@ func (k *kafka) publish(topics map[string]bool, key string, msg *Elements) error
 			return errors.New("write kafka timeout")
 		}
 
-	}
+	}*/
 
 	return nil
 }

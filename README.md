@@ -1,6 +1,15 @@
 Free and High Performance MQTT Broker 
 ============
 
+## 修改
+
+---
+
+主要修改：
+
+* 验证插件可外部提供
+* TLS验证客户端
+
 ## About
 Golang MQTT Broker, Version 3.1.1, and Compatible
 for [eclipse paho client](https://github.com/eclipse?utf8=%E2%9C%93&q=mqtt&type=&language=) and mosquitto-client
