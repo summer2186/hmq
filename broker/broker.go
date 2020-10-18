@@ -96,6 +96,11 @@ func NewBroker(config *Config) (*Broker, error) {
 	b.auth = b.config.Plugin.Auth
 	b.bridgeMQ = b.config.Plugin.Bridge
 
+	b.auth2 = b.config.Auth2
+	if b.config.Auth != nil {
+		b.auth = b.config.Auth
+	}
+
 	return b, nil
 }
 
